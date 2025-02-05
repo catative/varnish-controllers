@@ -174,6 +174,10 @@ class ClpVarnish
         }
     }
 
+    public function clearQueuedPurges() {
+        self::$queuedPurges['tags'] = [];
+    }
+
     private function purge(array $headers): void
     {
         try {
@@ -260,14 +264,4 @@ if (true === file_exists($settingsFile)) {
     $clpVarnish->setCacheLifetime($varnishCacheLifetime);
     $clpVarnish->setExcludes($varnishCacheExcludes);
     $clpVarnish->setExcludedParams($varnishCacheExcludedParams);
-    $headerRegisterCallback = function() use ($clpVarnish) {
-        $cacheTagPrefix = $clpVarnish->getCacheTagPrefix();
-        $clpVarnish->sendCacheHeaders();
-    };
-    $registerShutdownCallback = function() use ($clpVarnish) {
-        $cacheTagPrefix = $clpVarnish->getCacheTagPrefix();
-        $clpVarnish->shutdownPurge();
-    };
-    header_register_callback($headerRegisterCallback);
-    register_shutdown_function($registerShutdownCallback);
 }
